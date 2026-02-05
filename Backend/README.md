@@ -62,4 +62,55 @@ curl -X POST http://localhost:5000/users/register \
 
 ---
 
-If you want I can add automated tests or a Postman example for this endpoint. 💡
+## POST /users/login
+
+Authenticate an existing user and return a JWT token and the authenticated user object.
+
+---
+
+### Request
+
+- Headers:
+  - `Content-Type: application/json`
+
+- Body (JSON):
+
+```json
+{
+  "email": "john@example.com",
+  "password": "strongpassword"
+}
+```
+
+---
+
+### Validation / Required fields
+
+- `email` — required, valid email format.
+- `password` — required, minimum length 6.
+
+If validation fails the endpoint responds with **400 Bad Request** and an `errors` array from `express-validator`.
+
+---
+
+### Responses
+
+- **200 OK** ✅
+  - Body: `{ "token": "<jwt>", "user": { ... } }`
+- **400 Bad Request** ⚠️
+  - Validation errors: `{ "errors": [...] }`
+- **401 Unauthorized** ⚠️
+  - Invalid email or password: `{ "message": "Invalid email" }` or `{ "message": "Invalid password" }`
+- **500 Internal Server Error** ⚠️
+  - `{ "message": "<error message>" }`
+
+---
+
+### Notes
+
+- Controller fetches the user with `select('+password')` and verifies the password with bcrypt (`comparePassword`).
+- Token is signed with `process.env.JWT_SECRET` using `user.generateAuthToken()`.
+
+---
+
+If you want I can add automated tests or a Postman example for these endpoints. 💡
