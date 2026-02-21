@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes.js";
+import captainRoutes from "./routes/captain.routes.js";
 import connectDB from "./db/db.js";
 import cookieParser from "cookie-parser";
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 
 app.use("/users", userRoutes);
+app.use("/captains", captainRoutes);
 
 export default app;
 
