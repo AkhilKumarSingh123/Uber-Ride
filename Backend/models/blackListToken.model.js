@@ -16,5 +16,11 @@ const blackListTokenSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("BlackListToken", blackListTokenSchema);
+// export default mongoose.model("BlackListToken", blackListTokenSchema);
+
+const BlackListToken =
+  mongoose.models.BlackListToken ||
+  mongoose.model("BlackListToken", blackListTokenSchema);
+
+export default BlackListToken;
 

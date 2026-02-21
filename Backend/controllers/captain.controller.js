@@ -2,6 +2,8 @@
 import captainModel from "../models/captain.model.js";
 import { validationResult } from "express-validator";
 import { createCaptain } from "../services/captain.service.js";
+import blackListTokenModel from "../models/blacklistToken.model.js";
+
 
 export const registerCaptain = async (req, res) => {
   try {
@@ -50,42 +52,41 @@ export const registerCaptain = async (req, res) => {
 
 
 
+export const loginCaptain = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
+    const { email, password } =  req.body;
 
-// export const loginUser = async (req, res, next) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
+    const captain = await captainModel.findOne({ email }).select('+password');
 
-//     const { email, password } =  req.body;
+    if (!captain) {
+      return res.status(401).json({ message: 'Invalid email' });
+    }
+    const isMatch = await captain.comparePassword(password);
 
-//     const user = await userModel.findOne({ email }).select('+password');
+    if(!isMatch){
+      return res.status(401).json({ message: 'Invalid password' });
+    }
+    const token = captain.generateAuthToken();
+    res.cookie('token', token);
 
-//     if (!user) {
-//       return res.status(401).json({ message: 'Invalid email' });
-//     }
-//     const isMatch = await user.comparePassword(password);
+    res.status(200).json({ token, captain });
+}
 
-//     if(!isMatch){
-//       return res.status(401).json({ message: 'Invalid password' });
-//     }
-//     const token = user.generateAuthToken();
-//     res.cookie('token', token);
+export const getCaptainProfile = async (req, res) => {
+   res.status(200).json({ captain: req.captain });
+}
 
-//     res.status(200).json({ token, user });
-// }
+export const logoutCaptain = async (req, res, next) => {
+    res.clearCookie('token');
+    const token = req.cookies.token || req.headers.authorization.split(" ")[1];
 
-// export const getUserProfile = async (req, res) => {
-//    res.status(200).json({ user: req.user });
-// }
+    await blackListTokenModel.create({ token });
+   
 
-// export const logoutUser = async (req, res, next) => {
-//     res.clearCookie('token');
-//     const token = req.cookies.token || req.headers.authorization.split(" ")[1];
-
-//     await blackListTokenModel.create({ token });
-
-//     res.status(200).json({ message: 'Logged out successfully' });
-// }
+    res.status(200).json({ message: 'Logged out successfully' });
+}
 

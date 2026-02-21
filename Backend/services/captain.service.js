@@ -1,4 +1,19 @@
 
+
+import captainModel from "../models/captain.model.js";
+
+export const createCaptain = async (data) => {
+  if (!data) {
+    throw new Error("Captain data is required");
+  }
+
+  const captain = await captainModel.create(data);
+  return captain;
+};
+
+
+
+
 // import captainModel from "../models/user.model.js";
 
 // export const createCaptain = async ({
@@ -27,14 +42,3 @@
 //     return captain;
 // }
 
-
-import captainModel from "../models/captain.model.js";
-
-export const createCaptain = async (data) => {
-  if (!data) {
-    throw new Error("Captain data is required");
-  }
-
-  const captain = await captainModel.create(data);
-  return captain;
-};
